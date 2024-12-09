@@ -4,10 +4,15 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
+from .models import Post
 
 @login_required(login_url='/signin')
 def home(request):
-    return render(request, 'index.html')
+    posts = Post.objects.all()
+    a = {
+        'posts': posts,
+    }
+    return render(request, 'index.html' , context=a)
 
 def account_settings(request):
     return render(request, 'account-setting.html')
@@ -67,6 +72,6 @@ def signup(request):
             return render(request, 'signup.html', context={'error': 'username has already been taken'})
         user = User.objects.create(username=username, password=make_password(password))
         user.save()
-        return redirect('/sigin')
+        return redirect('/signin')
 
     return render(request, 'signup.html')
