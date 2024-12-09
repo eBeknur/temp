@@ -33,6 +33,9 @@ def signin(request):
 
         if auth:
             login(request, auth)
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
             return redirect('/')
 
         return render(request, 'signin.html', context={'error': 'username or password  incorrect'})
@@ -42,7 +45,7 @@ def signin(request):
 
 
 
-
+@login_required(login_url='/signin')
 def logout_view(request):
     logout(request)
     return redirect('/')
@@ -51,6 +54,10 @@ def logout_view(request):
 
 
 def signup(request):
+    if request.user.is_authenticated:
+        return redirect('/')
+
+
     if request.method == 'POST':
         data = request.POST
         username = data.get('username')
@@ -60,6 +67,6 @@ def signup(request):
             return render(request, 'signup.html', context={'error': 'username has already been taken'})
         user = User.objects.create(username=username, password=make_password(password))
         user.save()
-        return redirect('/login')
+        return redirect('/sigin')
 
     return render(request, 'signup.html')
